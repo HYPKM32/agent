@@ -1,0 +1,29 @@
+services:
+###############################################################################
+  adk:
+    build:
+      context: ./adk
+      dockerfile: Dockerfile
+    container_name: adk
+    ports:
+      - "210.117.210.9:8894:8894"
+    volumes: 
+      - ./adk:/app
+    dns:
+      - 8.8.8.8
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+              device_ids: ['0','1','2','3','4','5','6','7']
+    stdin_open: true   
+    tty: true 
+
+  
+
+
+      
