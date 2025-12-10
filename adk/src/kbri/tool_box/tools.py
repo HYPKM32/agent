@@ -1,9 +1,18 @@
+#/app/src/kbri/tool_box/tools.py
 import requests
-from typing import Dict, Any, List
-from .config import GOOGLE_API_KEY, GOOGLE_SEARCH_ENGINE_ID
+from config import GOOGLE_API_KEY, GOOGLE_SEARCH_ENGINE_ID
+
 
 def google_search_tool(query: str) -> str:
-    """Google Custom Search API를 사용한 웹 검색"""
+    """
+    Google Custom Search API를 사용하여 웹 검색을 수행합니다.
+    
+    Args:
+        query: 검색할 쿼리 문자열
+        
+    Returns:
+        검색 결과를 포맷팅한 문자열
+    """
     if not GOOGLE_API_KEY or not GOOGLE_SEARCH_ENGINE_ID:
         return "Error: Google API Key or Search Engine ID is missing."
 
@@ -29,9 +38,9 @@ def google_search_tool(query: str) -> str:
             title = item.get("title", "No Title")
             snippet = item.get("snippet", "No Snippet")
             link = item.get("link", "No Link")
-            formatted_results += f"{i}. {title}\n   {snippet}\n   {link}\n\n"
+            formatted_results += f"{i}. Title: {title}\n   Snippet: {snippet}\n   Source: {link}\n\n"
             
         return formatted_results
 
     except requests.exceptions.RequestException as e:
-        return f"Search error: {str(e)}"
+        return f"Error during Google Search: {str(e)}"
