@@ -22,7 +22,8 @@ RUN pip install --upgrade pip && \
     pip install fastapi && \
     pip install uvicorn && \
     pip install websockets && \
-    pip install litellm
+    pip install litellm && \
+    pip install Optional
 
 # 포트 노출
 EXPOSE 8894

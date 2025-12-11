@@ -1,4 +1,4 @@
-#/app/src/kbri/config.py
+#/app/src/kbri/sub_agents/access_authenticator/config.py
 import os
 from pathlib import Path
 from dotenv import load_dotenv
@@ -17,8 +17,6 @@ INSTRUCTIONS_DIR = BASE_DIR / "instructions"
 OLLAMA_URL = os.getenv("OLLAMA_BASE_URL")
 PROVIDER = os.getenv("PROVIDER", "ollama_chat")
 MODEL_NAME = os.getenv("ADK_MODEL", "gpt-oss:120b")
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-GOOGLE_SEARCH_ENGINE_ID = os.getenv("GOOGLE_SEARCH_ENGINE_ID")
 
 # ===========================================
 # Instruction 로더
@@ -36,6 +34,6 @@ def load_instruction(filename: str) -> str:
 # Agent Instructions
 # ===========================================
 # Root Agent
-ROOT_AGENT_INSTRUCTION_KO = load_instruction("root_agent_ko.md")
-ROOT_AGENT_INSTRUCTION_EN = load_instruction("root_agent_en.md")
+ACCESS_AUTHENTICATOR_INSTRUCTION_KO = load_instruction("access_authenticator_ko.md")
+ACCESS_AUTHENTICATOR_INSTRUCTION_EN = load_instruction("access_authenticator_en.md")
 

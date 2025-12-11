@@ -1,111 +1,289 @@
-import re
+import os
+import requests
+from typing import Optional
+from pathlib import Path
+from dotenv import load_dotenv
 
-# Mock database (example of existing IDs)
-MOCK_USER_DB = {
-    "existing_user": {"name": "Existing User", "email": "test@test.com"}
-}
 
-def check_id_availability(user_id: str) -> dict:
+env_path = Path(__file__).parent.parent / ".env"
+load_dotenv(dotenv_path=env_path)
+
+KBRI_API_BASE_URL = os.getenv("KBRI_API_BASE_URL")
+
+
+def search_users(token: str, page: int = 1, count: int = 20) -> dict:
     """
-    Checks if the ID entered by the user is available.
+    Searches for users with pagination.
     
     Args:
-        user_id (str): User ID to check for duplication.
+        token: Bearer authentication token
+        page: Page number
+        count: Number of items per page
         
     Returns:
-        dict: Result in the format {'available': bool, 'message': str}.
+        Dictionary with status and response data
     """
-    if user_id in MOCK_USER_DB:
-        return {
-            "available": False,
-            "message": f"ID '{user_id}'는 이미 사용 중입니다. 다른 ID를 선택해주세요."
-        }
-    
-    return {
-        "available": True,
-        "message": f"ID '{user_id}'는 사용 가능합니다."
+    url = f"{KBRI_API_BASE_URL}/api/kbri/users/searchUsers"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
     }
-
-def validate_password(password: str) -> dict:
-    """
-    Validates password complexity (length, inclusion of special characters).
-    
-    Args:
-        password (str): Password to validate.
-        
-    Returns:
-        dict: Result in the format {'valid': bool, 'message': str}.
-    """
-    if len(password) < 8:
-        return {
-            "valid": False,
-            "message": "비밀번호는 최소 8자 이상이어야 합니다."
-        }
-    
-    # Check for special characters (one of !@#$%^&*)
-    if not re.search(r"[!@#$%^&*]", password):
-        return {
-            "valid": False,
-            "message": "비밀번호에는 최소 하나의 특수문자(!@#$%^&*)가 포함되어야 합니다."
-        }
-
-    return {
-        "valid": True,
-        "message": "안전한 비밀번호입니다."
+    payload = {
+        "page": page,
+        "count": count
     }
+    
+    try:
+        response = requests.post(url, headers=headers, json=payload)
+        response.raise_for_status()
+        return {"status": "success", "response": response.json()}
+    except requests.exceptions.RequestException as e:
+        return {"status": "error", "response": str(e)}
 
-def validate_email(email: str) -> dict:
+
+def check_username(token: str, username: str) -> dict:
     """
-    Validates if the email format is correct.
+    Checks if a username is already taken.
     
     Args:
-        email (str): Email address to validate.
+        token: Bearer authentication token
+        username: Username to check for availability
         
     Returns:
-        dict: {'valid': bool, 'message': str}.
+        Dictionary with status and response data
     """
-    # Use simple regex
-    email_regex = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
-    if not re.match(email_regex, email):
-        return {
-            "valid": False,
-            "message": "이메일 형식이 올바르지 않습니다. (예: user@example.com)"
-        }
-        
-    return {"valid": True, "message": "유효한 이메일 형식입니다."}
+    url = f"{KBRI_API_BASE_URL}/api/kbri/users/checkUsername"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "username": username
+    }
+    
+    try:
+        response = requests.post(url, headers=headers, json=payload)
+        response.raise_for_status()
+        return {"status": "success", "response": response.json()}
+    except requests.exceptions.RequestException as e:
+        return {"status": "error", "response": str(e)}
 
-def create_user_account(user_id: str, password: str, email: str, name: str) -> dict:
+    
+def create_user(
+    token: str,
+    username: str,
+    email: str,
+    password: str,
+    first_name: Optional[str] = None,
+    last_name: Optional[str] = None,
+    affiliation: Optional[str] = None,
+    department: Optional[str] = None,
+    degree: Optional[int] = None
+) -> dict:
     """
-    Creates the final user account based on validated information and saves it to the DB.
+    Creates a new user account.
     
     Args:
-        user_id (str): User ID.
-        password (str): Password.
-        email (str): Email address.
-        name (str): User's real name.
+        token: Bearer authentication token
+        username: User's login ID (lowercase letters and numbers, min 4 characters)
+        email: User's email address (must be unique)
+        password: User's password
+        first_name: User's first name
+        last_name: User's last name
+        affiliation: User's affiliated organization
+        department: User's department
+        degree: User's degree level (1=Doctorate, 2=Master's, 3=Bachelor's)
         
     Returns:
-        dict: {'success': bool, 'user_info': dict}.
+        Dictionary with status and response data
     """
-    # Final safeguard: Check for duplication right before creation
-    if user_id in MOCK_USER_DB:
-        return {
-            "success": False,
-            "message": "계정 생성 실패: 처리 도중 ID가 선점되었습니다."
-        }
-        
-    # Simulate DB save
-    new_user = {
-        "user_id": user_id,
-        "password": password, # In reality, hashing is required
+    url = f"{KBRI_API_BASE_URL}/api/kbri/users/createUser"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "username": username,
         "email": email,
-        "name": name
+        "password": password
     }
     
-    MOCK_USER_DB[user_id] = new_user
+    if first_name is not None:
+        payload["first_name"] = first_name
+    if last_name is not None:
+        payload["last_name"] = last_name
+    if affiliation is not None:
+        payload["affiliation"] = affiliation
+    if department is not None:
+        payload["department"] = department
+    if degree is not None:
+        payload["degree"] = degree
     
-    return {
-        "success": True,
-        "message": f"환영합니다, {name}님! 계정({user_id})이 성공적으로 생성되었습니다.",
-        "user_info": {k: v for k, v in new_user.items() if k != 'password'} # Return without password
+    try:
+        response = requests.post(url, headers=headers, json=payload)
+        response.raise_for_status()
+        return {"status": "success", "response": response.json()}
+    except requests.exceptions.RequestException as e:
+        return {"status": "error", "response": str(e)}
+
+    
+def modify_user(
+    token: str,
+    user_id: int,
+    first_name: Optional[str] = None,
+    last_name: Optional[str] = None,
+    username: Optional[str] = None,
+    email: Optional[str] = None,
+    affiliation: Optional[str] = None,
+    department: Optional[str] = None,
+    password: Optional[str] = None,
+    degree: Optional[int] = None,
+    status: Optional[int] = None
+) -> dict:
+    """
+    Modifies an existing user's information.
+    
+    Args:
+        token: Bearer authentication token
+        user_id: Target user's ID
+        first_name: User's first name
+        last_name: User's last name
+        username: User's login ID
+        email: User's email address
+        affiliation: User's affiliated organization
+        department: User's department
+        password: User's password
+        degree: User's degree level
+        status: User's account status
+        
+    Returns:
+        Dictionary with status and response data
+    """
+    url = f"{KBRI_API_BASE_URL}/api/kbri/users/modifyUser"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
     }
+    payload = {
+        "user_id": user_id
+    }
+    
+    if first_name is not None:
+        payload["first_name"] = first_name
+    if last_name is not None:
+        payload["last_name"] = last_name
+    if username is not None:
+        payload["username"] = username
+    if email is not None:
+        payload["email"] = email
+    if affiliation is not None:
+        payload["affiliation"] = affiliation
+    if department is not None:
+        payload["department"] = department
+    if password is not None:
+        payload["password"] = password
+    if degree is not None:
+        payload["degree"] = degree
+    if status is not None:
+        payload["status"] = status
+    
+    try:
+        response = requests.post(url, headers=headers, json=payload)
+        response.raise_for_status()
+        return {"status": "success", "response": response.json()}
+    except requests.exceptions.RequestException as e:
+        return {"status": "error", "response": str(e)}
+
+
+def delete_user(token: str, user_id: int) -> dict:
+    """
+    Deletes an existing user account.
+    
+    Args:
+        token: Bearer authentication token
+        user_id: Target user's ID to delete
+        
+    Returns:
+        Dictionary with status and response data
+    """
+    url = f"{KBRI_API_BASE_URL}/api/kbri/users/deleteUser"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "user_id": user_id
+    }
+    
+    try:
+        response = requests.post(url, headers=headers, json=payload)
+        response.raise_for_status()
+        return {"status": "success", "response": response.json()}
+    except requests.exceptions.RequestException as e:
+        return {"status": "error", "response": str(e)}
+
+
+def change_password(
+    token: str,
+    user_id: int,
+    current_password: str,
+    new_password: str
+) -> dict:
+    """
+    Changes a user's password.
+    
+    Args:
+        token: Bearer authentication token
+        user_id: Target user's ID
+        current_password: User's current password
+        new_password: User's new password
+        
+    Returns:
+        Dictionary with status and response data
+    """
+    url = f"{KBRI_API_BASE_URL}/api/kbri/users/changePassword"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "user_id": user_id,
+        "current_password": current_password,
+        "new_password": new_password
+    }
+    
+    try:
+        response = requests.post(url, headers=headers, json=payload)
+        response.raise_for_status()
+        return {"status": "success", "response": response.json()}
+    except requests.exceptions.RequestException as e:
+        return {"status": "error", "response": str(e)}
+    
+
+
+def resend_verification_email(token: str, email: str) -> dict:
+    """
+    Resends the verification email to the specified email address.
+    
+    Args:
+        token: Bearer authentication token
+        email: User's email address to resend verification
+        
+    Returns:
+        Dictionary with status and response data
+    """
+    url = f"{KBRI_API_BASE_URL}/api/kbri/users/resendVerificationEmail"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "email": email
+    }
+    
+    try:
+        response = requests.post(url, headers=headers, json=payload)
+        response.raise_for_status()
+        return {"status": "success", "response": response.json()}
+    except requests.exceptions.RequestException as e:
+        return {"status": "error", "response": str(e)}
