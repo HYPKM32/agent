@@ -1,14 +1,8 @@
-import os
+#/app/src/kbri/sub_agents/user_id_manager/tool_box/user_tools.py
 import requests
 from typing import Optional
-from pathlib import Path
-from dotenv import load_dotenv
+from ..config import KBRI_API_BASE_URL
 
-
-env_path = Path(__file__).parent.parent / ".env"
-load_dotenv(dotenv_path=env_path)
-
-KBRI_API_BASE_URL = os.getenv("KBRI_API_BASE_URL")
 
 
 def search_users(token: str, page: int = 1, count: int = 20) -> dict:
@@ -26,7 +20,8 @@ def search_users(token: str, page: int = 1, count: int = 20) -> dict:
     url = f"{KBRI_API_BASE_URL}/api/kbri/users/searchUsers"
     headers = {
         "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-Request-Source": "agent"
     }
     payload = {
         "page": page,
@@ -55,7 +50,8 @@ def check_username(token: str, username: str) -> dict:
     url = f"{KBRI_API_BASE_URL}/api/kbri/users/checkUsername"
     headers = {
         "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-Request-Source": "agent"
     }
     payload = {
         "username": username
@@ -100,7 +96,8 @@ def create_user(
     url = f"{KBRI_API_BASE_URL}/api/kbri/users/createUser"
     headers = {
         "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-Request-Source": "agent"
     }
     payload = {
         "username": username,
@@ -162,7 +159,8 @@ def modify_user(
     url = f"{KBRI_API_BASE_URL}/api/kbri/users/modifyUser"
     headers = {
         "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-Request-Source": "agent"
     }
     payload = {
         "user_id": user_id
@@ -209,7 +207,8 @@ def delete_user(token: str, user_id: int) -> dict:
     url = f"{KBRI_API_BASE_URL}/api/kbri/users/deleteUser"
     headers = {
         "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-Request-Source": "agent"
     }
     payload = {
         "user_id": user_id
@@ -244,7 +243,8 @@ def change_password(
     url = f"{KBRI_API_BASE_URL}/api/kbri/users/changePassword"
     headers = {
         "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-Request-Source": "agent"
     }
     payload = {
         "user_id": user_id,
@@ -275,7 +275,8 @@ def resend_verification_email(token: str, email: str) -> dict:
     url = f"{KBRI_API_BASE_URL}/api/kbri/users/resendVerificationEmail"
     headers = {
         "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-Request-Source": "agent"
     }
     payload = {
         "email": email

@@ -7,8 +7,8 @@ from .config import (
     ROOT_AGENT_INSTRUCTION_KO,
     ROOT_AGENT_INSTRUCTION_EN
 )
-from .tool_box import google_search
-from .sub_agents import (user_id_manager, access_authenticator, project_manager)
+from .tool_box import (google_search, create_session, check_session)
+from .sub_agents import (user_id_manager,project_manager)
 
 root_agent = Agent(
     model=LiteLlm(model=f"{PROVIDER}/{MODEL_NAME}"),
@@ -16,5 +16,5 @@ root_agent = Agent(
     description="Main orchestrator for search and user registration delegation.",
     instruction=ROOT_AGENT_INSTRUCTION_KO,
     tools=[google_search],
-    sub_agents=[user_id_manager, access_authenticator, project_manager]
+    sub_agents=[user_id_manager, project_manager]
 )

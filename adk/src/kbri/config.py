@@ -10,7 +10,7 @@ load_dotenv()
 # ===========================================
 BASE_DIR = Path(__file__).parent
 INSTRUCTIONS_DIR = BASE_DIR / "instructions"
-
+KBRI_API_BASE_URL = os.getenv("KBRI_API_BASE_URL")
 # ===========================================
 # 공통 설정
 # ===========================================

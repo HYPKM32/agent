@@ -1,15 +1,7 @@
 #/app/src/kbri/sub_agents/project_manager/tool_box/project_tools.py
-import os
 import requests
 from typing import Optional
-from pathlib import Path
-from dotenv import load_dotenv
-
-
-env_path = Path(__file__).parent.parent / ".env"
-load_dotenv(dotenv_path=env_path)
-
-KBRI_API_BASE_URL = os.getenv("KBRI_API_BASE_URL")
+from ..config import KBRI_API_BASE_URL
 
 
 def search_projects(
@@ -41,7 +33,8 @@ def search_projects(
     url = f"{KBRI_API_BASE_URL}/api/kbri/projects/searchProjects"
     headers = {
         "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-Request-Source": "agent"
     }
     payload = {
         "page": page,
@@ -106,7 +99,8 @@ def create_project(
     url = f"{KBRI_API_BASE_URL}/api/kbri/projects/createProject"
     headers = {
         "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-Request-Source": "agent"
     }
     payload = {
         "user_id": user_id,
@@ -182,7 +176,8 @@ def modify_project(
     url = f"{KBRI_API_BASE_URL}/api/kbri/projects/modifyProject"
     headers = {
         "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-Request-Source": "agent"
     }
     payload = {
         "project_id": project_id,
@@ -241,7 +236,8 @@ def check_duplicate_project(
     url = f"{KBRI_API_BASE_URL}/api/kbri/projects/checkDuplicateProject"
     headers = {
         "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-Request-Source": "agent"
     }
     payload = {
         "project_name": project_name
@@ -273,7 +269,8 @@ def delete_project(token: str, project_id: int, user_id: int) -> dict:
     url = f"{KBRI_API_BASE_URL}/api/kbri/projects/deleteProject"
     headers = {
         "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-Request-Source": "agent"
     }
     payload = {
         "project_id": project_id,
@@ -303,7 +300,8 @@ def get_project_detail(token: str, project_id: int, user_id: int = 0) -> dict:
     url = f"{KBRI_API_BASE_URL}/api/kbri/projects/getProjectDetail"
     headers = {
         "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-Request-Source": "agent"
     }
     payload = {
         "project_id": project_id,

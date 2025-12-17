@@ -15,6 +15,7 @@ INSTRUCTIONS_DIR = BASE_DIR / "instructions"
 # 공통 설정
 # ===========================================
 OLLAMA_URL = os.getenv("OLLAMA_BASE_URL")
+KBRI_API_BASE_URL = os.getenv("KBRI_API_BASE_URL")
 PROVIDER = os.getenv("PROVIDER", "ollama_chat")
 MODEL_NAME = os.getenv("ADK_MODEL", "gpt-oss:120b")
 
